@@ -106,6 +106,9 @@ def random_control(samples: list[Sample], seed: int = 0, reps: int = 3) -> dict:
     rng = np.random.default_rng(seed)
     out = []
     for _ in range(reps):
-        maps = rng.random((len(samples),) + samples[0].image.shape).astype(np.float32)
+        # Shaped from the mask, not the image: a real RGB sample's image is
+        # (3, H, W) while its heatmap is (H, W).
+        shape = (len(samples),) + samples[0].defect_mask.shape
+        maps = rng.random(shape).astype(np.float32)
         out.append(evaluate(maps, samples)["car"])
     return {"car_random": float(np.mean(out)), "car_random_std": float(np.std(out))}

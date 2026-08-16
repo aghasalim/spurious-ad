@@ -30,19 +30,25 @@ CONFOUND_BOX = (8, 8, 40, 40)  # x0, y0, x1, y1 -- top-left corner
 DEFECT_REGION = (72, 72, 232, 232)
 
 
+def confound_mask() -> np.ndarray:
+    """The confound region. Fixed, so it is the same target on synthetic and on
+    MVTec and CAR stays comparable between them."""
+    m = np.zeros((IMG, IMG), dtype=bool)
+    x0, y0, x1, y1 = CONFOUND_BOX
+    m[y0:y1, x0:x1] = True
+    return m
+
+
 @dataclass
 class Sample:
-    image: np.ndarray        # (IMG, IMG) float32 in [0, 1]
+    image: np.ndarray        # (IMG, IMG) or (3, IMG, IMG) float32 in [0, 1]
     label: int               # 1 = anomalous
     defect_mask: np.ndarray  # bool (IMG, IMG)
     has_confound: bool
 
     @property
     def confound_mask(self) -> np.ndarray:
-        m = np.zeros((IMG, IMG), dtype=bool)
-        x0, y0, x1, y1 = CONFOUND_BOX
-        m[y0:y1, x0:x1] = True
-        return m
+        return confound_mask()
 
 
 def _texture(rng: np.random.Generator) -> np.ndarray:
@@ -80,8 +86,10 @@ def _paste_confound(img: np.ndarray, rng: np.random.Generator) -> None:
     """A small bright mark in the corner: a batch stamp, a lighting artefact,
     a watermark. Deliberately nothing to do with product quality."""
     x0, y0, x1, y1 = CONFOUND_BOX
-    patch = img[y0:y1, x0:x1]
-    img[y0:y1, x0:x1] = np.clip(patch + rng.uniform(0.22, 0.30), 0, 1)
+    # Leading ellipsis so the identical mark can be stamped on a (H, W) synthetic
+    # image or a (3, H, W) real one -- one code path, same semantics.
+    patch = img[..., y0:y1, x0:x1]
+    img[..., y0:y1, x0:x1] = np.clip(patch + rng.uniform(0.22, 0.30), 0, 1)
 
 
 def make_split(
