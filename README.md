@@ -1,5 +1,10 @@
 # SpuriousAD — a planted-confound benchmark that refutes its own premise
 
+> The synthetic finding now **replicates on real MVTec images** across two
+> detector families and two backbones — see [External validity](#external-validity-real-mvtec-images-two-detectors-two-backbones).
+> Pinning the training-set confound rate halves CAR at perfect label
+> correlation, so the effect is train-set absence, not a label shortcut.
+
 [![ci](https://github.com/aghasalim/spurious-ad/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/spurious-ad/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -129,14 +134,55 @@ generated, which is what makes exact two-region ground truth possible.
 
 ---
 
+## External validity: real MVTec images, two detectors, two backbones
+
+The synthetic result above says label correlation does not drive the confound
+attribution — the CAR rise is the mark going *out of distribution* in the
+normal-only training set, not the detector learning a label shortcut it cannot
+mechanically learn. That is a claim about mechanism, so it has to survive real
+images. It does. `make real-mechanism` runs the same planted confound on MVTec
+AD, five categories (bottle, carpet, grid, hazelnut, tile), the identical
+per-category random-heatmap null (which varies with region area, so it is
+computed per category and never assumed).
+
+The load-bearing test, at ρ=1.0 where the mark predicts the label perfectly —
+the only difference between the two rows is whether the mark stays in the
+normal-only training set (`wide_resnet50_2`, 1,062 anomalous images/cell):
+
+| detector | training rate | CAR | its null | peak on defect |
+|---|---|---|---|---|
+| PatchCore | free → **0.000** | **0.415** | 0.430 | 36.9% |
+| PatchCore | **pinned at 0.51** | **0.189** | 0.430 | **74.8%** |
+| PaDiM | free → **0.000** | 0.387 | 0.430 | 49.3% |
+| PaDiM | **pinned at 0.51** | **0.201** | 0.430 | **74.9%** |
+
+Pinning the training rate **halves CAR and doubles the peak-on-defect rate**, at
+identical, perfect label correlation. With the pin in place CAR is flat across ρ.
+The synthetic finding replicates on real images across **two detector families** —
+PatchCore (non-parametric kNN) and PaDiM (a fitted per-patch Gaussian), which
+share only the "model normal, flag departures" structure the conclusion rests on.
+
+A second backbone corroborates it. On `resnet18` (sweep only, no pin), CAR never
+even reaches its null: it rises 0.21 → 0.39 as ρ goes 0 → 1 while the null sits
+at 0.43, so the confound attribution stays *below chance* at every correlation
+level. I did not run the pinned ablation on resnet18 — the mechanism claim rests
+on the `wide_resnet50_2` pin above; resnet18 only shows the effect is, if
+anything, weaker on a smaller extractor.
+
+One detail that protects the metric: the loader drops anomalous images whose
+ground-truth mask touches the confound box (else the two regions overlap and CAR
+is unscoreable) and masks that vanish at 256 px (a zero defect denominator would
+score a spurious CAR of 1.0). Both counts are reported per result row, not
+silently applied — across all 15 categories the constraint costs 0–8 images each.
+
 ## Honest limitations
 
-- **Synthetic only.** Textures are sinusoidal, defects are blobs. The mechanism
-  finding does not depend on realism — it is about what the training distribution
-  contains — but the specific CAR values would move on MVTec.
-- **One detector family.** PatchCore-style memory-bank kNN. PaDiM and reverse
-  distillation share the "model normal, flag departures" structure, so I expect
-  the argument to carry, but I have not run them.
+- **Synthetic textures are the core; MVTec is the external check.** The mechanism
+  finding now holds on real images (above), but the headline synthetic CAR values
+  are specific to the generator — the *ordering and the mechanism* are what
+  transfer, not the exact numbers.
+- **The resnet18 arm is a sweep, not the pinned ablation.** It corroborates but
+  does not independently establish the mechanism claim.
 - **Random subsampling, not greedy coreset selection.** Greedy k-center is
   PatchCore's efficiency contribution and does not change what the memory
   represents.
