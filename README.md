@@ -19,7 +19,44 @@ pointing at the wrong region. **It doesn't — and finding out why is the result
 
 ---
 
-## The headline
+
+---
+
+## Abstract
+
+A natural way to build a controlled Clever Hans benchmark for unsupervised
+anomaly detection is to plant an artefact that correlates with the defect label
+and then measure whether the detector's heatmap moves onto it. This work builds
+that benchmark, reproduces a large effect with it, and then shows the effect is
+not the phenomenon it appears to be.
+
+As the planted confound strengthens, image AUROC rises to 0.993 (PaDiM) and 0.998
+(PatchCore) while the fraction of heatmap peaks landing on the real defect falls
+from about 0.75 to 0.49 and 0.37. Reproducible, and present across categories and
+across a backbone swap.
+
+The ablation refutes the interpretation. Raising the confound strength does two
+things at once: it makes the artefact predict the label, and it drives the
+artefact out of the normal-only training set. Pinning the training confound rate
+at 0.465 separates them — and with it pinned, the collapse disappears entirely,
+even at the strength where the artefact predicts the label perfectly. In
+hindsight this is mechanical: an unsupervised detector never sees a label, so a
+label shortcut is not available to it. What it reacts to is a distributional
+departure, and flagging that is arguably correct behaviour.
+
+The contribution is therefore negative and methodological. The intuitive
+construction produces a real, reproducible, 4.2x effect that has nothing to do
+with the phenomenon it claims to study.
+
+**Contributions.** (i) A planted-confound benchmark with a confound attribution
+ratio and a random-attribution baseline. (ii) An ablation pinning the training
+rate, which removes the effect. (iii) External validity checks across MVTec
+categories, two detectors and two backbones. (iv) A negative result about how not
+to construct this benchmark.
+
+---
+
+## 1. The headline
 
 Sweeping confound–label correlation ρ from 0 to 1, three seeds, PatchCore-style
 detector trained on normal images only (`make sweep`):
@@ -44,7 +81,16 @@ defect) rises 4.2×. That looks like the predicted collapse. It isn't:
   produce, which is set by the two regions' relative areas.
 - The hottest single pixel still lands on the real defect **80.8%** of the time.
 
-## Then the ablation killed the premise outright
+![AUROC rises while localisation collapses](reports/figures/dissociation.png)
+
+![the confound alone reaches AUROC 1.000](reports/figures/confound-alone.png)
+
+## 2. Then the ablation killed the premise outright
+
+![pinning the training rate removes the collapse](reports/figures/mechanism.png)
+
+Dashed lines are the pinned-training-rate control. The collapse disappears under
+it, which is what rules out the label-shortcut reading.
 
 Raising ρ does two things at once, and they are not the same thing:
 
@@ -92,7 +138,9 @@ notion of a **specific competing region**, which is what makes "the heat went
 
 ---
 
-## The metric
+## 3. The metric
+
+![attribution against the random-attribution baseline](reports/figures/attribution.png)
 
 ```
 CAR = mass(confound) / (mass(defect) + mass(confound))
@@ -117,7 +165,7 @@ Three things it does deliberately:
 
 ---
 
-## Running it
+## 4. Running it
 
 ```bash
 make setup && make test
@@ -134,7 +182,11 @@ generated, which is what makes exact two-region ground truth possible.
 
 ---
 
-## External validity: real MVTec images, two detectors, two backbones
+## 5. External validity
+
+![per-category localisation](reports/figures/by-category.png)
+
+![the same sweep under a different backbone](reports/figures/backbone.png)
 
 The synthetic result above says label correlation does not drive the confound
 attribution — the CAR rise is the mark going *out of distribution* in the
@@ -175,7 +227,7 @@ is unscoreable) and masks that vanish at 256 px (a zero defect denominator would
 score a spurious CAR of 1.0). Both counts are reported per result row, not
 silently applied — across all 15 categories the constraint costs 0–8 images each.
 
-## Honest limitations
+## 6. Limitations
 
 - **Synthetic textures are the core; MVTec is the external check.** The mechanism
   finding now holds on real images (above), but the headline synthetic CAR values
@@ -190,6 +242,6 @@ silently applied — across all 15 categories the constraint costs 0–8 images 
   a genuine unsupervised Clever Hans effect — only a demonstration that this
   construction does not produce one.
 
-## License
+## 7. Licence
 
 MIT — see [LICENSE](LICENSE).
