@@ -1,7 +1,7 @@
-# SpuriousAD — a planted-confound benchmark that refutes its own premise
+# SpuriousAD, a planted-confound benchmark that refutes its own premise
 
 > The synthetic finding now **replicates on real MVTec images** across two
-> detector families and two backbones — see [External validity](#external-validity-real-mvtec-images-two-detectors-two-backbones).
+> detector families and two backbones, see [External validity](#external-validity-real-mvtec-images-two-detectors-two-backbones).
 > Pinning the training-set confound rate halves CAR at perfect label
 > correlation, so the effect is train-set absence, not a label shortcut.
 
@@ -15,7 +15,7 @@ label, plus a metric for whether a detector's heatmap lands on the defect or the
 mark. Built by a third-year Applied Computer Science (AI) student.
 
 I built it to show that an unsupervised detector can score a perfect AUROC while
-pointing at the wrong region. **It doesn't — and finding out why is the result.**
+pointing at the wrong region. **It doesn't, and finding out why is the result.**
 
 ---
 
@@ -38,7 +38,7 @@ across a backbone swap.
 The ablation refutes the interpretation. Raising the confound strength does two
 things at once: it makes the artefact predict the label, and it drives the
 artefact out of the normal-only training set. Pinning the training confound rate
-at 0.465 separates them — and with it pinned, the collapse disappears entirely,
+at 0.465 separates them, and with it pinned, the collapse disappears entirely,
 even at the strength where the artefact predicts the label perfectly. In
 hindsight this is mechanical: an unsupervised detector never sees a label, so a
 label shortcut is not available to it. What it reacts to is a distributional
@@ -58,7 +58,7 @@ to construct this benchmark.
 
 ## 1. The headline
 
-Sweeping confound–label correlation ρ from 0 to 1, three seeds, PatchCore-style
+Sweeping confound, label correlation ρ from 0 to 1, three seeds, PatchCore-style
 detector trained on normal images only (`make sweep`):
 
 | ρ | image AUROC | CAR | CAR random control | peak on defect |
@@ -70,10 +70,10 @@ detector trained on normal images only (`make sweep`):
 | 1.00 | **1.000** | **0.560** | 0.610 | 80.8% |
 
 **AUROC is 1.000 at every level.** The metric the whole field reports is
-perfectly blind to whether a spurious mark is driving the score — that part of
+perfectly blind to whether a spurious mark is driving the score, that part of
 the hypothesis holds completely.
 
-CAR (Confound Attribution Ratio — share of heat on the mark rather than the
+CAR (Confound Attribution Ratio, share of heat on the mark rather than the
 defect) rises 4.2×. That looks like the predicted collapse. It isn't:
 
 - CAR at ρ=1 is **0.560 against a random-heatmap control of 0.610**. The detector
@@ -94,9 +94,9 @@ it, which is what rules out the label-shortcut reading.
 
 Raising ρ does two things at once, and they are not the same thing:
 
-- **A — label shortcut.** The detector exploits the mark *because it predicts the
+- **A: label shortcut.** The detector exploits the mark *because it predicts the
   label*. This is the Clever Hans story.
-- **B — training-set absence.** Raising ρ drives P(mark | normal) toward 0, so the
+- **B: training-set absence.** Raising ρ drives P(mark | normal) toward 0, so the
   mark stops appearing in the normal-only training set and becomes genuinely
   out-of-distribution.
 
@@ -107,18 +107,18 @@ Pinning the training rate at 0.465 while varying ρ separates them (`make mechan
 | free (falls to **0.000** at ρ=1) | 0.133 | 0.144 | **0.560** |
 | **pinned at 0.465** | 0.133 | 0.117 | **0.130** |
 
-**With the training rate held fixed, CAR does not move — even at ρ=1.0, where the
+**With the training rate held fixed, CAR does not move, even at ρ=1.0, where the
 mark predicts the label perfectly.** Label correlation contributes essentially
 nothing. Every bit of the apparent collapse was mechanism B.
 
 In hindsight this is obvious, which is the useful part: **an unsupervised detector
 never sees a label, so a label shortcut is not mechanically available to it.**
 PatchCore models P(normal) and flags departures from it. A mark that is absent
-from training and present at test time genuinely *is* a departure — flagging it is
+from training and present at test time genuinely *is* a departure, flagging it is
 arguably correct behaviour, not a Clever Hans effect.
 
-So the naive way to build this benchmark — plant a label-correlated confound and
-measure localisation — measures the wrong thing. It produces a real, reproducible,
+So the naive way to build this benchmark, plant a label-correlated confound and
+measure localisation, measures the wrong thing. It produces a real, reproducible,
 4.2× effect that has nothing to do with the phenomenon it claims to study.
 
 ### What this does and does not say about prior work
@@ -152,12 +152,12 @@ evidence on the real defect, 1 = all on the spurious mark.
 Three things it does deliberately:
 
 - **Mass, not peak.** A peak-based score is decided by one pixel and is unstable
-  across seeds. `peak_on_defect` is reported separately because it is the
-  operator-facing question — "the tool pointed here; is the defect there?"
+  across seeds.`peak_on_defect` is reported separately because it is the
+  operator-facing question, "the tool pointed here; is the defect there?"
 - **Restricted to two regions.** Absolute heat varies with contrast and detector
   calibration. A ratio between the two regions that matter is comparable across
-  detectors, at the cost of ignoring diffuse background — which
-  `background_share` reports rather than hides (it is ~0.89 throughout, so most
+  detectors, at the cost of ignoring diffuse background, which
+`background_share` reports rather than hides (it is ~0.89 throughout, so most
   heat is in neither region, and that is worth knowing).
 - **Always against a random control.** CAR has a nonzero null (~0.61 here) set by
   the regions' relative areas. Reading CAR without it would have made 0.560 look
@@ -171,7 +171,7 @@ Three things it does deliberately:
 make setup && make test
 ```
 
-8 tests, all on the generator and metric — the instrument, not the model.
+8 tests, all on the generator and metric, the instrument, not the model.
 
 ```bash
 make sweep && make mechanism
@@ -189,15 +189,15 @@ generated, which is what makes exact two-region ground truth possible.
 ![the same sweep under a different backbone](reports/figures/backbone.png)
 
 The synthetic result above says label correlation does not drive the confound
-attribution — the CAR rise is the mark going *out of distribution* in the
+attribution, the CAR rise is the mark going *out of distribution* in the
 normal-only training set, not the detector learning a label shortcut it cannot
 mechanically learn. That is a claim about mechanism, so it has to survive real
-images. It does. `make real-mechanism` runs the same planted confound on MVTec
+images. It does.`make real-mechanism` runs the same planted confound on MVTec
 AD, five categories (bottle, carpet, grid, hazelnut, tile), the identical
 per-category random-heatmap null (which varies with region area, so it is
 computed per category and never assumed).
 
-The load-bearing test, at ρ=1.0 where the mark predicts the label perfectly —
+The load-bearing test, at ρ=1.0 where the mark predicts the label perfectly
 the only difference between the two rows is whether the mark stays in the
 normal-only training set (`wide_resnet50_2`, 1,062 anomalous images/cell):
 
@@ -210,28 +210,27 @@ normal-only training set (`wide_resnet50_2`, 1,062 anomalous images/cell):
 
 Pinning the training rate **halves CAR and doubles the peak-on-defect rate**, at
 identical, perfect label correlation. With the pin in place CAR is flat across ρ.
-The synthetic finding replicates on real images across **two detector families** —
-PatchCore (non-parametric kNN) and PaDiM (a fitted per-patch Gaussian), which
+The synthetic finding replicates on real images across **two detector families**: PatchCore (non-parametric kNN) and PaDiM (a fitted per-patch Gaussian), which
 share only the "model normal, flag departures" structure the conclusion rests on.
 
-A second backbone corroborates it. On `resnet18` (sweep only, no pin), CAR never
+A second backbone corroborates it. On`resnet18` (sweep only, no pin), CAR never
 even reaches its null: it rises 0.21 → 0.39 as ρ goes 0 → 1 while the null sits
 at 0.43, so the confound attribution stays *below chance* at every correlation
-level. I did not run the pinned ablation on resnet18 — the mechanism claim rests
-on the `wide_resnet50_2` pin above; resnet18 only shows the effect is, if
+level. I did not run the pinned ablation on resnet18, the mechanism claim rests
+on the`wide_resnet50_2` pin above; resnet18 only shows the effect is, if
 anything, weaker on a smaller extractor.
 
 One detail that protects the metric: the loader drops anomalous images whose
 ground-truth mask touches the confound box (else the two regions overlap and CAR
 is unscoreable) and masks that vanish at 256 px (a zero defect denominator would
 score a spurious CAR of 1.0). Both counts are reported per result row, not
-silently applied — across all 15 categories the constraint costs 0–8 images each.
+silently applied, across all 15 categories the constraint costs 0 to 8 images each.
 
 ## 6. Limitations
 
 - **Synthetic textures are the core; MVTec is the external check.** The mechanism
   finding now holds on real images (above), but the headline synthetic CAR values
-  are specific to the generator — the *ordering and the mechanism* are what
+  are specific to the generator, the *ordering and the mechanism* are what
   transfer, not the exact numbers.
 - **The resnet18 arm is a sweep, not the pinned ablation.** It corroborates but
   does not independently establish the mechanism claim.
@@ -239,9 +238,9 @@ silently applied — across all 15 categories the constraint costs 0–8 images 
   PatchCore's efficiency contribution and does not change what the memory
   represents.
 - **The negative result is the contribution.** There is no demonstration here of
-  a genuine unsupervised Clever Hans effect — only a demonstration that this
+  a genuine unsupervised Clever Hans effect, only a demonstration that this
   construction does not produce one.
 
 ## 7. Licence
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
