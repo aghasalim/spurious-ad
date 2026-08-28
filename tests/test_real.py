@@ -1,6 +1,6 @@
 """Tests for the MVTec loader and the second detector family.
 
-CI never downloads MVTec -- these build a three-image fake dataset with the real
+CI never downloads MVTec, these build a three-image fake dataset with the real
 directory layout. What is being tested is the loader's contract (disjointness,
 the rho association, normal-only training), not MVTec itself.
 """
@@ -32,9 +32,9 @@ def fake_mvtec(tmp_path):
         _png(base / "test/good" / f"{i:03d}.png",
              rng.integers(0, 255, (SRC, SRC, 3), dtype=np.uint8))
 
-    # 000: defect in the middle -- usable.
-    # 001: defect in the confound corner -- must be dropped as overlapping.
-    # 002: defect too small to survive the resize -- must be dropped as empty.
+    # 000: defect in the middle: usable.
+    # 001: defect in the confound corner: must be dropped as overlapping.
+    # 002: defect too small to survive the resize: must be dropped as empty.
     boxes = {"000": (150, 150, 200, 200), "001": (0, 0, 30, 30), "002": None}
     for stem, box in boxes.items():
         _png(base / "test/scratch" / f"{stem}.png",

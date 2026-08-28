@@ -3,7 +3,7 @@
 Faithful to the parts of the method that matter for the claim rather than to
 every implementation detail. What has to be right is the shape of the pipeline --
 mid-level pretrained features, a memory bank of *normal* patches, and an anomaly
-score that is a distance to the nearest normal patch -- because that is what
+score that is a distance to the nearest normal patch, because that is what
 produces a spatial anomaly map, and the spatial map is what this project
 interrogates.
 """
@@ -142,7 +142,7 @@ class PaDiM:
     paper uses 550 of 1792 at a 56x56 grid; this uses 100 of 1536 at 32x32, which
     keeps the 1024 covariance matrices small enough to invert on a laptop and
     keeps n_train (200-400 images) comfortably above the dimension. Statistics
-    are fitted and applied on CPU -- MPS has no `linalg.inv` -- while the
+    are fitted and applied on CPU, MPS has no `linalg.inv`, while the
     backbone stays on the GPU, where the cost actually is.
     """
 

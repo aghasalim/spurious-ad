@@ -1,9 +1,9 @@
 """The same planted confound, on real MVTec AD images.
 
 The synthetic generator is the controlled instrument; this is the external
-validity check. The construction is identical -- a bright mark in a fixed corner,
+validity check. The construction is identical, a bright mark in a fixed corner,
 present at rate `0.5 + rho/2` on anomalous images and `0.5 - rho/2` on normal
-ones -- but the images and the defects are real and the defect masks are MVTec's
+ones, but the images and the defects are real and the defect masks are MVTec's
 own annotations rather than something this repo drew.
 
 Two things have to hold for CAR to mean anything here, and both are enforced
@@ -16,7 +16,7 @@ rather than assumed:
   location would correlate with defect location, which is a second confound.
 * **The defect must survive the resize.** A mask that becomes empty at 256px
   gives CAR a zero denominator on the defect side, which would score as 1.0 --
-  "all heat on the confound" -- for the wrong reason. Those are dropped too
+  "all heat on the confound", for the wrong reason. Those are dropped too
   (`skipped_empty`).
 
 Both counts are reported, because a filter that silently removed the hard cases

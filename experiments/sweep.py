@@ -2,7 +2,7 @@
 
 Sweeps confound-label correlation from 0 to 1. At each level, trains PatchCore
 on normal images only, then reports image-level AUROC alongside the Confound
-Attribution Ratio -- against a random-heatmap control, because a faithfulness
+Attribution Ratio, against a random-heatmap control, because a faithfulness
 number with no null is not evidence.
 
 The hypothesis under test: **AUROC stays flat near 1.0 while CAR climbs toward
@@ -41,7 +41,7 @@ def run_one(rho: float, seed: int) -> dict:
     f = faithfulness.evaluate(maps, test)
     ctrl = faithfulness.random_control(test, seed=seed)
 
-    # How predictive the confound is of the label in this split -- a sanity
+    # How predictive the confound is of the label in this split: a sanity
     # check that the generator produced the association it was asked for.
     conf = np.array([s.has_confound for s in test])
     conf_auc = float(roc_auc_score(te_y, conf.astype(float))) if conf.std() else 0.5

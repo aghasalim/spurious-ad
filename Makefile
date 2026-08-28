@@ -1,4 +1,4 @@
-.PHONY: setup sweep mechanism real real-sweep real-mechanism real-backbone test clean
+.PHONY: setup sweep mechanism real real-sweep real-mechanism real-backbone figures test clean
 PY := .venv/bin/python
 # Real-data runs need MVTec AD on disk; set MVTEC_ROOT or pass --root.
 # Tests never touch it, so CI stays download-free.
@@ -17,6 +17,8 @@ real-mechanism:  ## the decisive ablation, on real images
 	$(PY) -m experiments.real --mode mechanism --categories $(CATS) --detectors $(DETS)
 real-backbone:   ## same sweep, different feature extractor
 	$(PY) -m experiments.real --mode backbone --arch resnet18 --categories $(CATS) --detectors $(DETS)
+figures:    ## redraw reports/figures from the committed CSVs, no training
+	$(PY) scripts/make_figures.py
 test:
 	$(PY) -m pytest tests/ -q
 clean:

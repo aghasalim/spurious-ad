@@ -2,8 +2,8 @@
 
 Every anomalous image carries two things:
 
-  1. a **true defect** -- a blob somewhere in the product region, with a pixel mask
-  2. a **confound** -- a small mark in a fixed corner, statistically correlated
+  1. a **true defect**, a blob somewhere in the product region, with a pixel mask
+  2. a **confound**, a small mark in a fixed corner, statistically correlated
      with the anomaly label but *spatially disjoint* from the defect
 
 The correlation strength `rho` is a knob. At rho=1.0 the confound is present in
@@ -24,7 +24,7 @@ from dataclasses import dataclass
 import numpy as np
 
 IMG = 256
-CONFOUND_BOX = (8, 8, 40, 40)  # x0, y0, x1, y1 -- top-left corner
+CONFOUND_BOX = (8, 8, 40, 40)  # x0, y0, x1, y1, top-left corner
 # Defects are confined away from the confound corner so the two regions can
 # never overlap. If they could, a heatmap covering both would be unscoreable.
 DEFECT_REGION = (72, 72, 232, 232)
@@ -67,7 +67,7 @@ def _texture(rng: np.random.Generator) -> np.ndarray:
 
 
 def _paste_defect(img: np.ndarray, rng: np.random.Generator) -> np.ndarray:
-    """An irregular darker blob -- the thing a human would call the defect."""
+    """An irregular darker blob, the thing a human would call the defect."""
     x0, y0, x1, y1 = DEFECT_REGION
     cx, cy = rng.integers(x0, x1), rng.integers(y0, y1)
     r = rng.integers(10, 20)
@@ -87,7 +87,7 @@ def _paste_confound(img: np.ndarray, rng: np.random.Generator) -> None:
     a watermark. Deliberately nothing to do with product quality."""
     x0, y0, x1, y1 = CONFOUND_BOX
     # Leading ellipsis so the identical mark can be stamped on a (H, W) synthetic
-    # image or a (3, H, W) real one -- one code path, same semantics.
+    # image or a (3, H, W) real one: one code path, same semantics.
     patch = img[..., y0:y1, x0:x1]
     img[..., y0:y1, x0:x1] = np.clip(patch + rng.uniform(0.22, 0.30), 0, 1)
 
@@ -103,7 +103,7 @@ def make_split(
         P(confound | normal)  = 0.5 - rho / 2
     so rho=0 gives no association and rho=1 gives a perfect one.
 
-    Training data is normal-only -- this is unsupervised AD, the detector never
+    Training data is normal-only, this is unsupervised AD, the detector never
     sees an anomaly. The confound still appears in training at its normal-class
     rate, which is what makes the setup honest: nothing tells the model the
     corner mark matters, it has to infer that from the data it is given.
