@@ -90,6 +90,10 @@ The collapse disappears under it, which is what rules out the label-shortcut rea
 
 ![pinning the training rate removes the collapse](reports/figures/mechanism.png)
 
+![the same ablation walked from rho 0 to rho 1](reports/figures/rho-sweep.gif)
+
+*Same ablation, animated: rho climbs from 0 to 1 while each detector's marker walks through AUROC against peak on defect, the solid arms let the mark drop out of the normal-only training set and the dashed arms hold that training rate fixed.*
+
 Full detail in [notes/METHODS.md](notes/METHODS.md#2-then-the-ablation-killed-the-premise-outright).
 ### What this does and does not say about prior work
 
