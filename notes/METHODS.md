@@ -6,7 +6,7 @@ Long form detail moved out of the README.
 ## 2. Then the ablation killed the premise outright
 
 
-![pinning the training rate removes the collapse](reports/figures/mechanism.png)
+![pinning the training rate removes the collapse](../reports/figures/mechanism.png)
 
 Dashed lines are the pinned-training-rate control. The collapse disappears under
 it, which is what rules out the label-shortcut reading.
@@ -44,7 +44,7 @@ measure localisation, measures the wrong thing. It produces a real, reproducible
 ## 3. The metric
 
 
-![attribution against the random-attribution baseline](reports/figures/attribution.png)
+![attribution against the random-attribution baseline](../reports/figures/attribution.png)
 
 ```
 CAR = mass(confound) / (mass(defect) + mass(confound))
@@ -73,9 +73,9 @@ Three things it does deliberately:
 ## 5. External validity
 
 
-![per-category localisation](reports/figures/by-category.png)
+![per-category localisation](../reports/figures/by-category.png)
 
-![the same sweep under a different backbone](reports/figures/backbone.png)
+![the same sweep under a different backbone](../reports/figures/backbone.png)
 
 The synthetic result above says label correlation does not drive the confound
 attribution, the CAR rise is the mark going *out of distribution* in the
