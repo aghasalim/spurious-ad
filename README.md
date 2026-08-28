@@ -1,7 +1,7 @@
 # SpuriousAD, a planted-confound benchmark that refutes its own premise
 
 > The synthetic finding now **replicates on real MVTec images** across two
-> detector families and two backbones, see [External validity](#external-validity-real-mvtec-images-two-detectors-two-backbones).
+> detector families and two backbones, see [External validity](#5-external-validity).
 > Pinning the training-set confound rate halves CAR at perfect label
 > correlation, so the effect is train-set absence, not a label shortcut.
 
