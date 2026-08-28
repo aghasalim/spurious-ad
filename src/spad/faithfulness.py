@@ -3,7 +3,7 @@
 The metric this project contributes. Existing localisation metrics (AUPRO,
 AUPIMO) score a heatmap against the ground-truth defect mask, with AUPIMO
 additionally penalising false positives on normal images. None of them has a
-notion of a *confound region* -- an area that is spatially disjoint from the
+notion of a *confound region*, an area that is spatially disjoint from the
 defect and statistically correlated with the label. So none can distinguish
 "heatmap landed on a spurious cue that predicts the label" from ordinary
 background noise, which is exactly the failure mode here.
@@ -26,7 +26,7 @@ model's evidence sits there.
 *A ratio between two regions, not an absolute score.* Absolute intensity varies
 with image contrast and detector calibration, which are nuisances. Restricting
 to the two regions that matter makes the number comparable across detectors and
-correlation levels, at the cost of ignoring diffuse background response -- which
+correlation levels, at the cost of ignoring diffuse background response, which
 `background_share` reports separately so it is visible rather than hidden.
 
 Every score is reported against a **random-heatmap control**. A metric with no
@@ -58,7 +58,7 @@ def car(m: np.ndarray, defect: np.ndarray, confound: np.ndarray) -> float:
 
 
 def background_share(m: np.ndarray, defect: np.ndarray, confound: np.ndarray) -> float:
-    """Fraction of heat outside both regions -- the part CAR deliberately ignores."""
+    """Fraction of heat outside both regions, the part CAR deliberately ignores."""
     m = _norm(m)
     total = float(m.sum())
     if total <= 0:
@@ -82,7 +82,7 @@ def evaluate(maps: np.ndarray, samples: list[Sample]) -> dict:
         cars.append(car(m, s.defect_mask, s.confound_mask))
         bgs.append(background_share(m, s.defect_mask, s.confound_mask))
         # Does the single hottest pixel land in the defect? The operator-facing
-        # question: "the tool pointed here -- is the defect there?"
+        # question: "the tool pointed here: is the defect there?"
         peak = np.unravel_index(np.argmax(m), m.shape)
         defect_hit.append(bool(s.defect_mask[peak]))
     if not cars:
@@ -98,7 +98,7 @@ def evaluate(maps: np.ndarray, samples: list[Sample]) -> dict:
 
 
 def random_control(samples: list[Sample], seed: int = 0, reps: int = 3) -> dict:
-    """CAR of uniform-noise heatmaps -- the null this metric must be read against.
+    """CAR of uniform-noise heatmaps, the null this metric must be read against.
 
     Nonzero by construction: the confound box and the defect blob have different
     areas, so random heat splits between them in proportion to area alone.

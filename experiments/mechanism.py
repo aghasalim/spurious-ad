@@ -7,11 +7,11 @@ design and they imply completely different things:
      the label. This is the supervised Clever Hans story.
   B. **Train-set absence.** Raising rho drives P(confound | normal) toward 0, so
      the confound simply stops appearing in the normal-only training set and
-     becomes out-of-distribution. The detector then flags it *correctly* -- it
+     becomes out-of-distribution. The detector then flags it *correctly*, it
      is genuinely novel relative to what the model was shown.
 
 A is the interesting claim. B is nearly a tautology. An unsupervised detector
-never sees a label, so A is not even mechanically available to it -- which is
+never sees a label, so A is not even mechanically available to it, which is
 the point this experiment nails down rather than assumes.
 
 Holding the training confound rate fixed at 0.5 while varying the test-time

@@ -2,7 +2,7 @@
 
 The synthetic result was that image AUROC is blind to the confound, that CAR's
 apparent collapse is near the random-heatmap null, and that pinning the
-training-set confound rate removes the effect entirely -- i.e. the label
+training-set confound rate removes the effect entirely, i.e. the label
 correlation contributes nothing, because an unsupervised detector never sees a
 label. All three claims are re-run here on real photographs with MVTec's own
 defect annotations, and across two detector families, because a conclusion that
@@ -10,9 +10,9 @@ only holds on sinusoidal textures under one kNN detector is not a conclusion.
 
 Three modes, all writing to `reports/`:
 
-  sweep      -- AUROC and CAR vs rho, per category, per detector
-  mechanism  -- the decisive ablation: pin the training confound rate, vary rho
-  backbone   -- the same sweep with a different feature extractor
+  sweep, AUROC and CAR vs rho, per category, per detector
+  mechanism, the decisive ablation: pin the training confound rate, vary rho
+  backbone, the same sweep with a different feature extractor
 
 Rows are appended to the JSON after every fit, so a long run can be watched and
 a crashed one is not lost.
