@@ -56,7 +56,7 @@ evidence on the real defect, 1 = all on the spurious mark.
 Three things it does deliberately:
 
 - **Mass, not peak.** A peak-based score is decided by one pixel and is unstable
-  across seeds.`peak_on_defect` is reported separately because it is the
+  across seeds. `peak_on_defect` is reported separately because it is the
   operator-facing question, "the tool pointed here; is the defect there?"
 - **Restricted to two regions.** Absolute heat varies with contrast and detector
   calibration. A ratio between the two regions that matter is comparable across
@@ -81,7 +81,7 @@ The synthetic result above says label correlation does not drive the confound
 attribution, the CAR rise is the mark going *out of distribution* in the
 normal-only training set, not the detector learning a label shortcut it cannot
 mechanically learn. That is a claim about mechanism, so it has to survive real
-images. It does.`make real-mechanism` runs the same planted confound on MVTec
+images. It does. `make real-mechanism` runs the same planted confound on MVTec
 AD, five categories (bottle, carpet, grid, hazelnut, tile), the identical
 per-category random-heatmap null (which varies with region area, so it is
 computed per category and never assumed).
@@ -102,11 +102,11 @@ identical, perfect label correlation. With the pin in place CAR is flat across �
 The synthetic finding replicates on real images across **two detector families**: PatchCore (non-parametric kNN) and PaDiM (a fitted per-patch Gaussian), which
 share only the "model normal, flag departures" structure the conclusion rests on.
 
-A second backbone corroborates it. On`resnet18` (sweep only, no pin), CAR never
+A second backbone corroborates it. On `resnet18` (sweep only, no pin), CAR never
 even reaches its null: it rises 0.21 → 0.39 as ρ goes 0 → 1 while the null sits
 at 0.43, so the confound attribution stays *below chance* at every correlation
 level. I did not run the pinned ablation on resnet18, the mechanism claim rests
-on the`wide_resnet50_2` pin above; resnet18 only shows the effect is, if
+on the `wide_resnet50_2` pin above; resnet18 only shows the effect is, if
 anything, weaker on a smaller extractor.
 
 One detail that protects the metric: the loader drops anomalous images whose
