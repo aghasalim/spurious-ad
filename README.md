@@ -86,7 +86,12 @@ defect) rises 4.2×. That looks like the predicted collapse. It isn't:
 ![the confound alone reaches AUROC 1.000](reports/figures/confound-alone.png)
 
 ## 2. Then the ablation killed the premise outright
-The collapse disappears under it, which is what rules out the label-shortcut reading.
+Raising rho does two things at once: it makes the mark predict the label, and it
+drives the mark out of the normal-only training set. Pinning the training
+confound rate at 0.465 holds the second one still while rho varies. With it
+pinned, CAR at rho=1 is 0.130, against 0.560 when the rate is left free and 0.133
+at rho=0. Label correlation contributes nothing, so the whole 4.2x effect was the
+mark going missing from training.
 
 ![pinning the training rate removes the collapse](reports/figures/mechanism.png)
 
@@ -115,6 +120,13 @@ notion of a **specific competing region**, which is what makes "the heat went
 ## 3. The metric
 ``` CAR = mass(confound) / (mass(defect) + mass(confound)) ``` over a normalised heatmap, on anomalous images that carry a confound.
 
+0 means all the evidence sits on the real defect, 1 means all of it sits on the
+spurious mark. The null is not 0. A random heatmap scores about 0.61 here,
+because the two regions' relative areas set the floor, so every CAR is read
+against that control. Most of the heat lands in neither region, background share
+runs 0.84 to 0.90 across the sweep, and the metric reports that instead of hiding
+it.
+
 ![attribution against the random-attribution baseline](reports/figures/attribution.png)
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#3-the-metric).
@@ -137,6 +149,13 @@ generated, which is what makes exact two-region ground truth possible.
 
 ## 5. External validity
 The synthetic result above says label correlation does not drive the confound attribution, the CAR rise is the mark going *out of distribution* in the normal-only training set, not the detector learning a label shortcut it cannot mechanically learn.
+That is a claim about mechanism, so it has to hold on real images. `make
+real-mechanism` plants the same confound in five MVTec AD categories and repeats
+the pin there. At rho=1.0 the pin takes PatchCore CAR from 0.415 to 0.189 and
+PaDiM from 0.387 to 0.201 against a null of 0.430, and PatchCore's hottest pixel
+lands on the real defect 74.8% of the time instead of 36.9%. A resnet18 sweep
+with no pin backs this from the other side: CAR climbs 0.21 to 0.39 across rho
+and never reaches its 0.43 null.
 
 ![per-category localisation](reports/figures/by-category.png)
 ![the same sweep under a different backbone](reports/figures/backbone.png)
