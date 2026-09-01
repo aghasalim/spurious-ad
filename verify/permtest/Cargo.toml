@@ -1,0 +1,11 @@
+[package]
+name = "permtest"
+version = "0.1.0"
+edition = "2021"
+
+# No dependencies on purpose. CI fetches nothing, and everything here is
+# enumeration and arithmetic.
+[dependencies]
+
+[profile.release]
+opt-level = 3
