@@ -52,6 +52,16 @@ typedef struct {
 
 /* --- a reader for the flat pretty-printed JSON experiments/real.py writes --- */
 
+/* A bounded copy that always terminates. Spelling it out rather than reaching
+ * for strncpy keeps the bound visible to the compiler as well as the reader. */
+static void copy_name(char *dst, const char *src, size_t cap)
+{
+    size_t n = strlen(src);
+    if (n >= cap) n = cap - 1;
+    memcpy(dst, src, n);
+    dst[n] = '\0';
+}
+
 static int json_key(const char *line, char *key, size_t cap, const char **value)
 {
     const char *a = strchr(line, '"');
@@ -129,8 +139,7 @@ static int load_runs(const char *path, Run *runs, int cap)
 static int column_of(const char *header, const char *name)
 {
     char buf[LINE];
-    strncpy(buf, header, sizeof buf - 1);
-    buf[sizeof buf - 1] = '\0';
+    snprintf(buf, sizeof buf, "%s", header);
     int i = 0;
     for (char *tok = strtok(buf, ",\r\n"); tok; tok = strtok(NULL, ",\r\n"), i++)
         if (!strcmp(tok, name)) return i;
@@ -210,7 +219,7 @@ int main(int argc, char **argv)
         if (g < 0) {
             if (n_groups >= MAX_GROUPS) { fprintf(stderr, "too many groups\n"); return 2; }
             g = n_groups++;
-            strncpy(groups[g].detector, r->detector, NAME - 1);
+            copy_name(groups[g].detector, r->detector, NAME);
             groups[g].pinned = r->pinned;
             groups[g].rho = r->rho;
             groups[g].count = 0;
@@ -244,8 +253,7 @@ int main(int argc, char **argv)
         if (line[0] == '\n' || line[0] == '\r' || line[0] == '\0') continue;
 
         char det[NAME];
-        strncpy(det, field(line, idx[0]), NAME - 1);
-        det[NAME - 1] = '\0';
+        copy_name(det, field(line, idx[0]), NAME);
         const int pinned = !strcmp(field(line, idx[1]), "True");
         const double rho = atof(field(line, idx[2]));
 
