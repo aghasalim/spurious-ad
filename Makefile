@@ -1,4 +1,4 @@
-.PHONY: setup sweep mechanism real real-sweep real-mechanism real-backbone figures test clean
+.PHONY: setup sweep mechanism real real-sweep real-mechanism real-backbone figures test verify clean
 PY := .venv/bin/python
 # Real-data runs need MVTec AD on disk; set MVTEC_ROOT or pass --root.
 # Tests never touch it, so CI stays download-free.
@@ -21,5 +21,7 @@ figures:    ## redraw reports/figures from the committed CSVs, no training
 	$(PY) scripts/make_figures.py
 test:
 	$(PY) -m pytest tests/ -q
+verify:     ## recompute every published table from the raw runs, in seven other languages
+	./verify/verify.sh
 clean:
 	rm -rf reports/*.json reports/*.csv

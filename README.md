@@ -136,7 +136,8 @@ Full detail in [notes/METHODS.md](notes/METHODS.md#3-the-metric).
 make setup && make test
 ```
 
-8 tests, all on the generator and metric, the instrument, not the model.
+17 tests, on the generator, the metric and the MVTec loader, the
+instrument, not the model.
 
 ```bash
 make sweep && make mechanism
@@ -176,7 +177,84 @@ Full detail in [notes/METHODS.md](notes/METHODS.md#5-external-validity).
   a genuine unsupervised Clever Hans effect, only a demonstration that this
   construction does not produce one.
 
-## 7. Licence
+## 7. Everything here is recomputed in seven languages
+
+Every number in this README, in [notes/METHODS.md](notes/METHODS.md) and in
+every figure comes out of one pandas groupby, in
+[`experiments/sweep.py`](experiments/sweep.py),
+[`experiments/mechanism.py`](experiments/mechanism.py) and
+[`experiments/real.py`](experiments/real.py). The tests check the generator and
+the metric, which is the instrument. Nothing checked the tables, and nothing
+downstream could have, because the figures read the same CSV the README quotes.
+
+So the eight tables in `reports/` are recomputed from the raw per-run JSON next
+to them by seven implementations in seven other languages, and CI fails if any
+two disagree. A mistake would have to be repeated identically in all of them to
+survive.
+
+| implementation | what it recomputes | measured agreement |
+| --- | --- | --- |
+| [`verify/summaries.sql`](verify/summaries.sql) | the two synthetic summaries, as a group by in SQLite over `json_each` | 59 cells, largest gap 4.97e-05 |
+| [`verify/summary.c`](verify/summary.c) | the real ablation table: means, the sample sd of CAR, the n sum, columns resolved by name | 108 cells, largest gap 4.97e-05 |
+| [`verify/gocheck`](verify/gocheck) | all eight tables, plus the structure of all 13 files in `reports/` | 867 cells, largest gap 4.97e-05 |
+| [`verify/verify.R`](verify/verify.R) | the cell means, then a paired test and a category cluster interval on the pin effect | 36 cells, largest gap 4.57e-05 |
+| [`verify/permtest`](verify/permtest) | the same two questions by exhaustive enumeration, 543,038 statistics | exact, no sampling error |
+| [`verify/docnumbers.js`](verify/docnumbers.js) | the 74 figures quoted in the two documents, against the cells they were copied from | all 74 agree |
+| [`verify/crosscheck.rb`](verify/crosscheck.rb) | cell balance, the two groupbys folding into each other, reruns of a shared configuration | 513 runs, 171 cells; shared runs identical at 0.0e+00 |
+
+The published tables are rounded to four decimals, so an exact recomputation can
+differ from them by at most 5e-05. Every implementation is held to 6e-05, and
+the largest gap any of them found anywhere is 4.97e-05, which is the rounding
+and nothing else.
+
+Run them all with [`./verify/verify.sh`](verify/verify.sh). Each is skipped with
+a message if its toolchain is missing, so a partial install still runs the rest.
+
+**The ablation now has a test behind it.** The pin was reported as a difference
+of two means and left there. The design is paired, one run at pin off for every
+run at pin on with the same category, seed and detector, so R takes the 15
+paired differences at rho=1 and Rust walks all 2^15 sign assignments rather than
+assuming they are normal. PatchCore: mean +0.2254, t 4.47, exact p 4.883e-04.
+PaDiM: mean +0.1859, t 4.82, exact p 4.883e-04. That p is the smallest this data
+can produce, because three of the fifteen pairs differ by exactly zero.
+Resampling whole categories rather than runs, which is the honest unit when five
+MVTec categories are the population of interest, puts the PatchCore effect at
+[0.0803, 0.4014] and PaDiM at [0.0714, 0.3274]. R samples that interval 20,000
+times, Rust enumerates all 5^5 = 3,125 of them, and the two agree to four
+decimals on all four endpoints.
+
+**With a control.** At rho=0 the natural training confound rate already equals
+the pinned rate, so pinning is a no-op there and every paired difference is
+exactly zero, exact p 1.000. A test that cannot come back null is not a test.
+
+**One thing the checks changed.** The resnet18 sweep is described as staying
+below its random-heatmap null at every correlation. It does, as an ordering of
+the published means, and Go, R and Rust all reproduce those means. Run as a
+paired test on the individual runs, the separation is 4.8 to 10.6 standard
+errors at rho of 0.75 and below, and 1.1 for PatchCore and 1.5 for PaDiM at
+rho=1. The ordering at rho=1 is a point estimate, not a separation this data can
+defend, so the harness requires only the ordering there. Writing these checks
+also caught the test count in section 4, which still said 8 after the MVTec
+tests were added.
+
+**The harness is itself checked.** CI corrupts
+`reports/real_mechanism_summary.csv`, requires the harness to reject it,
+restores it and requires a pass. Each implementation catches what it is
+responsible for and nothing more:
+
+| what was corrupted | caught by |
+| --- | --- |
+| a published CAR in `sweep_summary.csv`, 0.5601 to 0.5701 | SQL, Go, JavaScript |
+| a published CAR in `real_mechanism_summary.csv`, 0.4146 to 0.4246 | C, Go, R, Rust, JavaScript, Ruby |
+| one run's CAR in `real_mechanism.json` | C, Go, R, Rust, Ruby |
+| a cell replaced by `nan` in `real_sweep_summary.csv` | Go, Ruby |
+| an extra field on one row of `real_sweep_by_category.csv` | Go |
+| one run deleted from `real_backbone.json` | Go, Ruby |
+| the headline effect written as 5.2x in this README | JavaScript |
+| the pinned CAR values rotated between categories, leaving every per-detector cell mean untouched | Go, R, Rust |
+
+## 8. Licence
+
 
 MIT, see [LICENSE](LICENSE).
 

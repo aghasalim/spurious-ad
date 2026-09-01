@@ -17,3 +17,33 @@ jobs:
       - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
       - run: pip install -r requirements.txt pytest
       - run: python -m pytest tests/ -q
+
+  # Every table in reports/ is one pandas groupby. These recompute all of them
+  # from the raw per-run JSON in seven other languages, then corrupt a table and
+  # require the harness to reject it, because a check that cannot fail is not
+  # evidence. No Python here on purpose.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: R, only if the runner image does not already carry it
+        run: command -v Rscript || sudo apt-get install -y --no-install-recommends r-base-core
+      - name: every implementation agrees
+        run: |
+          ./verify/verify.sh | tee "$RUNNER_TEMP/verify.log"
+          grep -q '0 failed, 0 skipped$' "$RUNNER_TEMP/verify.log"
+      - name: the harness rejects a corrupted table
+        run: |
+          sed -i 's/,0.4146,/,0.4246,/' reports/real_mechanism_summary.csv
+          if git diff --quiet reports/real_mechanism_summary.csv; then
+            echo "the corruption did not change the file"
+            exit 1
+          fi
+          if ./verify/verify.sh; then
+            echo "the harness accepted a table that no longer matches the runs"
+            exit 1
+          fi
+      - name: and passes again once it is restored
+        run: |
+          git checkout -- reports/real_mechanism_summary.csv
+          ./verify/verify.sh

@@ -5,3 +5,8 @@ __pycache__/
 .DS_Store
 .env
 .env.local
+
+# build products from verify/
+verify/permtest/target/
+verify/gocheck/gocheck
+verify/summary
