@@ -164,6 +164,26 @@ and never reaches its 0.43 null.
 ![the same sweep under a different backbone](reports/figures/backbone.png)
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#5-external-validity).
+
+### The pin effect under a paired test
+
+The pin was reported as a difference of two means and left there. The design is
+paired, one run at pin off for every run at pin on with the same category, seed
+and detector, so the test takes the 15 paired differences at rho=1 and walks all
+2^15 sign assignments rather than assuming they are normal. PatchCore: mean
++0.2254, t 4.47, exact p 4.883e-04. PaDiM: mean +0.1859, t 4.82, exact p
+4.883e-04. That p is the smallest this data can produce, because three of the
+fifteen pairs differ by exactly zero.
+
+Resampling whole categories rather than runs, which is the honest unit when five
+MVTec categories are the population of interest, puts the PatchCore effect at
+[0.0803, 0.4014] and PaDiM at [0.0714, 0.3274]. That interval is both sampled
+20,000 times and enumerated exhaustively over all 5^5 = 3,125 category
+resamples, and the two agree to four decimals on all four endpoints.
+
+**With a control.** At rho=0 the natural training confound rate already equals
+the pinned rate, so pinning is a no-op there and every paired difference is
+exactly zero, exact p 1.000. A test that cannot come back null is not a test.
 ## 6. Limitations
 
 - **Synthetic textures are the core; MVTec is the external check.** The mechanism
