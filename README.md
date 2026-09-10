@@ -12,7 +12,7 @@
 A controlled anomaly-detection dataset where every anomalous image contains a
 **true defect** and a spatially-disjoint **spurious mark** correlated with the
 label, plus a metric for whether a detector's heatmap lands on the defect or the
-mark. Built by a third-year Applied Computer Science (AI) student.
+mark.
 
 I built it to show that an unsupervised detector can score a perfect AUROC while
 pointing at the wrong region. **It doesn't, and finding out why is the result.**
@@ -99,7 +99,7 @@ mark going missing from training.
 
 *Each detector walks from rho 0 to rho 1 through AUROC against peak on defect. Solid arms let the mark fall out of the normal-only training set, dashed arms pin that rate, and only the solid ones collapse.*
 
-Full detail in [notes/METHODS.md](notes/METHODS.md#2-then-the-ablation-killed-the-premise-outright).
+Worked through in [notes/METHODS.md](notes/METHODS.md#2-then-the-ablation-killed-the-premise-outright).
 ### What this does and does not say about prior work
 
 It does not contradict [Kauffmann et al., *The Clever Hans Effect in Unsupervised
@@ -129,7 +129,8 @@ it.
 
 ![attribution against the random-attribution baseline](reports/figures/attribution.png)
 
-Full detail in [notes/METHODS.md](notes/METHODS.md#3-the-metric).
+Worked through in [notes/METHODS.md](notes/METHODS.md#3-the-metric).
+
 ## 4. Running it
 
 ```bash
@@ -163,7 +164,7 @@ and never reaches its 0.43 null.
 ![per-category localisation](reports/figures/by-category.png)
 ![the same sweep under a different backbone](reports/figures/backbone.png)
 
-Full detail in [notes/METHODS.md](notes/METHODS.md#5-external-validity).
+Worked through in [notes/METHODS.md](notes/METHODS.md#5-external-validity).
 
 ### The pin effect under a paired test
 
@@ -206,8 +207,8 @@ MIT, see [LICENSE](LICENSE).
 
 ## References
 
-The papers and sources this implementation follows. Each one is here because
-the code uses the method, the dataset or the metric it describes.
+Two detector papers, the dataset the replication runs on, and the paper that
+names the failure mode this benchmark was built to plant on purpose.
 
 - **Roth, Pemula, Zepeda, Schölkopf, Brox, Gehler. Towards Total Recall in Industrial Anomaly Detection. CVPR 2022.** [arXiv:2106.08265](https://arxiv.org/abs/2106.08265) PatchCore.
 - **Defard, Setkov, Loesch, Audigier. PaDiM: a Patch Distribution Modeling Framework. ICPR 2021.** [arXiv:2011.08785](https://arxiv.org/abs/2011.08785) PaDiM.
