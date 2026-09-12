@@ -21,7 +21,7 @@ jobs:
   # Every table in reports/ is one pandas groupby. These recompute all of them
   # from the raw per-run JSON in seven other languages, then corrupt a table and
   # require the harness to reject it, because a check that cannot fail is not
-  # evidence. No Python here on purpose.
+  # a check. No Python here on purpose.
   verify:
     runs-on: ubuntu-latest
     steps:
