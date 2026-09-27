@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it as below.
+title: "SpuriousAD, a planted-confound benchmark that refutes its own premise"
+abstract: "A planted-confound benchmark for unsupervised anomaly detection, built to show a detector can score a perfect AUROC while pointing at the wrong region. It does not, and why is the result."
+type: software
+authors:
+  - family-names: Mustafazada
+    given-names: Aghasalim
+    orcid: "https://orcid.org/0009-0001-8746-4582"
+    affiliation: "Howest University of Applied Sciences"
+repository-code: "https://github.com/aghasalim/spurious-ad"
+url: "https://aghasalim.github.io/"
+license: MIT
+keywords:
+  - anomaly detection
+  - computer vision
+  - explainable ai
+  - machine learning
+  - model evaluation
+  - pytorch
