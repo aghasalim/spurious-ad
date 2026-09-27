@@ -73,8 +73,7 @@ AUROC is 1.000 at every level. The metric the whole field reports is
 perfectly blind to whether a spurious mark is driving the score, that part of
 the hypothesis holds completely.
 
-CAR (Confound Attribution Ratio, share of heat on the mark instead of the
-defect) rises 4.2×. That looks like the predicted collapse. It isn't:
+CAR (Confound Attribution Ratio, share of heat on the mark, not the defect) rises 4.2×. That looks like the predicted collapse. It isn't:
 
 - CAR at ρ=1 is **0.560 against a random-heatmap control of 0.610**. The detector
   never becomes confound-*seeking*; it decays to roughly what uniform noise would
