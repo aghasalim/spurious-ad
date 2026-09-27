@@ -48,7 +48,7 @@ The contribution is therefore negative and methodological. The intuitive
 construction produces a real, reproducible, 4.2x effect that has nothing to do
 with the phenomenon it claims to study.
 
-**Contributions.** (i) A planted-confound benchmark with a confound attribution
+Contributions. (i) A planted-confound benchmark with a confound attribution
 ratio and a random-attribution baseline. (ii) An ablation pinning the training
 rate, which removes the effect. (iii) External validity checks across MVTec
 categories, two detectors and two backbones. (iv) A negative result about how not
@@ -69,11 +69,11 @@ detector trained on normal images only (`make sweep`):
 | 0.75 | **1.000** | 0.187 | 0.607 | 93.9% |
 | 1.00 | **1.000** | **0.560** | 0.610 | 80.8% |
 
-**AUROC is 1.000 at every level.** The metric the whole field reports is
+AUROC is 1.000 at every level. The metric the whole field reports is
 perfectly blind to whether a spurious mark is driving the score, that part of
 the hypothesis holds completely.
 
-CAR (Confound Attribution Ratio, share of heat on the mark rather than the
+CAR (Confound Attribution Ratio, share of heat on the mark instead of the
 defect) rises 4.2×. That looks like the predicted collapse. It isn't:
 
 - CAR at ρ=1 is **0.560 against a random-heatmap control of 0.610**. The detector
