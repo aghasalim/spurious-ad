@@ -9,6 +9,8 @@ interrogates.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -50,7 +52,7 @@ class Backbone:
         net.layer2.register_forward_hook(self._hook("l2"))
         net.layer3.register_forward_hook(self._hook("l3"))
 
-    def _hook(self, name):
+    def _hook(self, name: str) -> Callable:
         def fn(_m, _i, out):
             self._feat[name] = out
         return fn
