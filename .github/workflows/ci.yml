@@ -14,9 +14,12 @@ jobs:
           cache: pip
       # CPU torch: the tests exercise the generator and the metric, neither of
       # which needs a GPU or the full CUDA stack.
-      - run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-      - run: pip install -r requirements.txt pytest
-      - run: python -m pytest tests/ -q
+      - name: install CPU torch
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+      - name: install
+        run: pip install -r requirements.txt pytest
+      - name: test
+        run: python -m pytest tests/ -q
 
   # Every table in reports/ is one pandas groupby. These recompute all of them
   # from the raw per-run JSON in seven other languages, then corrupt a table and
