@@ -33,9 +33,7 @@ from PIL import Image
 
 from .data import IMG, Sample, _paste_confound, confound_mask
 
-DEFAULT_ROOT = os.environ.get(
-    "MVTEC_ROOT", str(Path.home() / "Dev/explainable-defect-detector/data/mvtec")
-)
+DEFAULT_ROOT = os.environ.get("MVTEC_ROOT")
 
 
 def _load_img(p: Path) -> np.ndarray:
@@ -51,9 +49,12 @@ def _load_mask(p: Path) -> np.ndarray:
 
 
 @lru_cache(maxsize=2)  # experiments loop category-outermost; 2 bounds RAM at ~600MB
-def load_raw(root: str, category: str) -> dict:
+def load_raw(root: str | None, category: str) -> dict:
     """Decode one category once. Confound planting is a separate, cheap step, so
     a whole rho x seed grid costs one pass over the PNGs rather than fifteen."""
+    if not root:
+        raise FileNotFoundError(
+            "no MVTec AD root: set MVTEC_ROOT or pass --root to the folder that holds the categories")
     base = Path(root) / category
     if not (base / "train" / "good").is_dir():
         raise FileNotFoundError(f"no MVTec category at {base}")
@@ -91,7 +92,7 @@ def load_raw(root: str, category: str) -> dict:
 
 def make_split(
     category: str, rho: float, seed: int = 0, *, train: bool = False,
-    train_confound_rate: float | None = None, root: str = DEFAULT_ROOT,
+    train_confound_rate: float | None = None, root: str | None = DEFAULT_ROOT,
 ) -> list[Sample]:
     """Plant the confound at correlation `rho`. Mirrors `data.make_split`.
 
