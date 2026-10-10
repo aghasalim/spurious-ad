@@ -78,6 +78,8 @@ def main() -> None:
     ap.add_argument("--root", default=mvtec.DEFAULT_ROOT)
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
+    if not a.root:
+        ap.error("MVTec AD location unknown: set MVTEC_ROOT or pass --root")
 
     if a.mode == "mechanism":
         grid = [(r, p) for p in (False, True) for r in MECH_RHOS]

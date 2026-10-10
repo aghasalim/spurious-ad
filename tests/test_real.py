@@ -125,3 +125,9 @@ def test_padim_refuses_a_rank_deficient_fit():
     x = np.stack([s.image for s in data.make_split(6, 0.0, seed=0, train=True)])
     with pytest.raises(ValueError):
         PaDiM(n_dims=100, arch="resnet18").fit(x)
+
+
+def test_missing_root_says_how_to_set_it():
+    # No personal default path: without MVTEC_ROOT or --root the loader has to say so.
+    with pytest.raises(FileNotFoundError, match="MVTEC_ROOT"):
+        mvtec.load_raw(None, "bottle")
