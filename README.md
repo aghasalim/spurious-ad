@@ -1,5 +1,3 @@
-<p align="center"><img src="assets/banner.jpg" alt="Line drawing of an image tile with a real defect and a decoy corner mark, and a detector choosing between them" width="100%"></p>
-
 # SpuriousAD, a planted-confound benchmark that refutes its own premise
 
 > Update: the synthetic result now also shows up on real MVTec images, with two
